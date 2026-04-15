@@ -1,17 +1,28 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import API from '../api'
 
 function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    role: 'citizen',
   })
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const redirectPath = location.state?.from || '/dashboard'
+
+  useEffect(() => {
+    const token = localStorage.getItem('janconnect_token')
+
+    if (token) {
+      navigate(redirectPath, { replace: true })
+    }
+  }, [navigate, redirectPath])
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -32,17 +43,27 @@ function LoginPage() {
         throw new Error('Please fill in all fields.')
       }
 
-      setTimeout(() => {
-        if (formData.role === 'staff') {
-          navigate('/staff-dashboard')
-        } else {
-          navigate('/dashboard')
-        }
-      }, 700)
+      const response = await API.post('/api/auth/login', {
+        email,
+        password: formData.password,
+      })
+
+      const result = response.data
+
+      localStorage.setItem('janconnect_token', result.data.token)
+      localStorage.setItem('janconnect_user', JSON.stringify(result.data))
+
+      window.dispatchEvent(new Event('storage'))
+
+      navigate(redirectPath, { replace: true })
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.')
+      setError(
+        err?.response?.data?.message ||
+          err.message ||
+          'Login failed. Please try again.'
+      )
     } finally {
-      setTimeout(() => setLoading(false), 700)
+      setLoading(false)
     }
   }
 
@@ -51,8 +72,14 @@ function LoginPage() {
       <div className="w-full max-w-md bg-white rounded-3xl shadow-sm border border-slate-200 p-6 md:p-8">
         <h1 className="text-3xl font-bold text-center mb-2">Login to Your Account</h1>
         <p className="text-center text-slate-600 mb-6">
-          Access your complaint dashboard or staff panel
+          Access your JanConnect account
         </p>
+
+        {location.state?.from && (
+          <div className="mb-4 rounded-xl bg-blue-100 text-blue-700 px-4 py-3">
+            Please login to continue.
+          </div>
+        )}
 
         {error && (
           <div className="mb-4 rounded-xl bg-red-100 text-red-700 px-4 py-3">
@@ -87,19 +114,6 @@ function LoginPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Login As</label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="citizen">Citizen</option>
-              <option value="staff">Staff</option>
-            </select>
-          </div>
-
           <button
             type="submit"
             disabled={loading}
@@ -115,14 +129,6 @@ function LoginPage() {
             Register here
           </Link>
         </p>
-
-        <div className="mt-6 rounded-2xl bg-slate-50 border border-slate-200 p-4">
-          <h2 className="font-semibold mb-2">Test Accounts</h2>
-          <p className="text-sm text-slate-600">Admin: admin@city.gov.in / password123</p>
-          <p className="text-sm text-slate-600">
-            Citizen: john@example.com / password123
-          </p>
-        </div>
       </div>
     </section>
   )

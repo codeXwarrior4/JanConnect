@@ -46,6 +46,13 @@ const issueSchema = new mongoose.Schema(
       enum: ["Submitted", "Under Review", "In Progress", "Resolved"],
       default: "Submitted",
     },
+
+    // 🔥 NEW FIELD (IMPORTANT)
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   {
     timestamps: true,

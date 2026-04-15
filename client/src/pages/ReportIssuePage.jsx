@@ -1,10 +1,18 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createIssue } from '../services/issueService'
 
 function ReportIssuePage() {
+  const storedUser = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem('janconnect_user') || 'null')
+    } catch {
+      return null
+    }
+  }, [])
+
   const [formData, setFormData] = useState({
-    name: '',
-    issueTitle: '',
+    name: storedUser?.name || '',
+    title: '',
     category: '',
     description: '',
     area: '',
@@ -136,12 +144,18 @@ function ReportIssuePage() {
     setComplaintId('')
 
     try {
+      const token = localStorage.getItem('janconnect_token')
+
+      if (!token) {
+        throw new Error('Please login first to submit a complaint.')
+      }
+
       const payload = {
-        name: formData.name,
-        title: formData.issueTitle,
-        category: formData.category,
-        description: formData.description,
-        area: formData.area,
+        name: formData.name.trim(),
+        title: formData.title.trim(),
+        category: formData.category.trim(),
+        description: formData.description.trim(),
+        area: formData.area.trim(),
         latitude: Number(formData.latitude),
         longitude: Number(formData.longitude),
       }
@@ -149,10 +163,11 @@ function ReportIssuePage() {
       const response = await createIssue(payload)
 
       setSuccessMessage('Complaint submitted successfully.')
-      setComplaintId(response.complaintId || response.data?.complaintId || '')
+      setComplaintId(response?.data?.complaintId || '')
+
       setFormData({
-        name: '',
-        issueTitle: '',
+        name: storedUser?.name || '',
+        title: '',
         category: '',
         description: '',
         area: '',
@@ -161,11 +176,14 @@ function ReportIssuePage() {
         latitude: '',
         longitude: '',
       })
+
       setCapturedImages([])
       closeCamera()
     } catch (err) {
       setError(
-        err.response?.data?.message || 'Failed to submit complaint. Try again.'
+        err?.response?.data?.message ||
+          err.message ||
+          'Failed to submit complaint. Try again.'
       )
     } finally {
       setLoading(false)
@@ -198,15 +216,13 @@ function ReportIssuePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-5">
             <div>
-              <label className="block text-sm font-medium mb-2">Your Name *</label>
+              <label className="block text-sm font-medium mb-2">Logged In User</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
-                onChange={handleChange}
-                placeholder="Enter full name"
-                className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                required
+                readOnly
+                className="w-full px-4 py-3 border border-slate-300 rounded-xl bg-slate-50 text-slate-700 outline-none"
               />
             </div>
 
@@ -232,8 +248,8 @@ function ReportIssuePage() {
               <label className="block text-sm font-medium mb-2">Issue Title *</label>
               <input
                 type="text"
-                name="issueTitle"
-                value={formData.issueTitle}
+                name="title"
+                value={formData.title}
                 onChange={handleChange}
                 placeholder="e.g. Water stagnant on road"
                 className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
@@ -381,7 +397,7 @@ function ReportIssuePage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {capturedImages.map((image, index) => (
                       <div
-                        key={image}
+                        key={`${image}-${index}`}
                         className="bg-white border border-slate-200 rounded-2xl p-3"
                       >
                         <img

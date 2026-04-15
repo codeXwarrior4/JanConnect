@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const issueRoutes = require("./routes/issueRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/issues", issueRoutes);
+app.use("/api/auth", authRoutes);
 
 // 404 route handler
 app.use((req, res) => {
@@ -49,6 +51,10 @@ const startServer = async () => {
   try {
     if (!MONGO_URI) {
       throw new Error("MONGO_URI is missing in .env file");
+    }
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is missing in .env file");
     }
 
     await mongoose.connect(MONGO_URI);

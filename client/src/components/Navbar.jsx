@@ -1,17 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const profileRef = useRef(null)
+  const [user, setUser] = useState(null)
 
-  const navClass = ({ isActive }) =>
-    `block px-4 py-2 rounded-lg text-sm font-medium transition ${
-      isActive
-        ? 'bg-white text-sky-600 shadow-sm'
-        : 'text-white/95 hover:bg-white/20 hover:text-white'
-    }`
+  const profileRef = useRef(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const syncUserFromStorage = () => {
+      try {
+        const storedUser = localStorage.getItem('janconnect_user')
+        setUser(storedUser ? JSON.parse(storedUser) : null)
+      } catch {
+        setUser(null)
+      }
+    }
+
+    syncUserFromStorage()
+    window.addEventListener('storage', syncUserFromStorage)
+
+    return () => {
+      window.removeEventListener('storage', syncUserFromStorage)
+    }
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -21,15 +35,35 @@ function Navbar() {
     }
 
     document.addEventListener('mousedown', handleClickOutside)
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
 
+  const navClass = ({ isActive }) =>
+    `block px-4 py-2 rounded-lg text-sm font-medium transition ${
+      isActive
+        ? 'bg-white text-sky-600 shadow-sm'
+        : 'text-white/95 hover:bg-white/20 hover:text-white'
+    }`
+
   const closeAllMenus = () => {
     setIsMenuOpen(false)
     setIsProfileOpen(false)
   }
+
+  const handleLogout = () => {
+    localStorage.removeItem('janconnect_token')
+    localStorage.removeItem('janconnect_user')
+    setUser(null)
+    closeAllMenus()
+    navigate('/login')
+  }
+
+  const displayName = user?.name || 'Guest User'
+  const displayEmail = user?.email || 'janconnect@example.com'
+  const isLoggedIn = Boolean(localStorage.getItem('janconnect_token'))
 
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-sky-400 to-blue-400 shadow-md">
@@ -63,51 +97,75 @@ function Navbar() {
               </button>
 
               {isProfileOpen && (
-                <div className="absolute right-0 mt-3 w-52 bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
                   <div className="px-4 py-3 border-b border-slate-100">
-                    <p className="text-sm font-semibold text-slate-800">Guest User</p>
-                    <p className="text-xs text-slate-500">janconnect@example.com</p>
+                    <p className="text-sm font-semibold text-slate-800">{displayName}</p>
+                    <p className="text-xs text-slate-500">{displayEmail}</p>
                   </div>
 
                   <div className="py-2">
-                    <Link
-                      to="/my-complaints"
-                      onClick={closeAllMenus}
-                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                    >
-                      My Complaints
-                    </Link>
-                    <Link
-                      to="/dashboard"
-                      onClick={closeAllMenus}
-                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      to="/login"
-                      onClick={closeAllMenus}
-                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      to="/register"
-                      onClick={closeAllMenus}
-                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                    >
-                      Register
-                    </Link>
+                    {isLoggedIn ? (
+                      <>
+                        <Link
+                          to="/my-complaints"
+                          onClick={closeAllMenus}
+                          className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          My Complaints
+                        </Link>
+                        <Link
+                          to="/dashboard"
+                          onClick={closeAllMenus}
+                          className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          Dashboard
+                        </Link>
+                        <Link
+                          to="/report"
+                          onClick={closeAllMenus}
+                          className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          Report Issue
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          to="/login"
+                          onClick={closeAllMenus}
+                          className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          Login
+                        </Link>
+                        <Link
+                          to="/register"
+                          onClick={closeAllMenus}
+                          className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          Register
+                        </Link>
+                      </>
+                    )}
                   </div>
 
                   <div className="border-t border-slate-100 py-2">
-                    <Link
-                      to="/login"
-                      onClick={closeAllMenus}
-                      className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      Logout
-                    </Link>
+                    {isLoggedIn ? (
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        Logout
+                      </button>
+                    ) : (
+                      <Link
+                        to="/login"
+                        onClick={closeAllMenus}
+                        className="block px-4 py-2 text-sm text-sky-600 hover:bg-sky-50"
+                      >
+                        Login to continue
+                      </Link>
+                    )}
                   </div>
                 </div>
               )}
@@ -150,21 +208,38 @@ function Navbar() {
           <NavLink to="/" className={navClass}>
             Home
           </NavLink>
-          <NavLink to="/dashboard" className={navClass}>
-            Dashboard
-          </NavLink>
+
+          {isLoggedIn && (
+            <>
+              <NavLink to="/report" className={navClass}>
+                Report Issue
+              </NavLink>
+              <NavLink to="/dashboard" className={navClass}>
+                Dashboard
+              </NavLink>
+              <NavLink to="/my-complaints" className={navClass}>
+                My Complaints
+              </NavLink>
+            </>
+          )}
+
           <NavLink to="/track" className={navClass}>
             Track Complaint
           </NavLink>
           <NavLink to="/staff-login" className={navClass}>
             Staff Login
           </NavLink>
-          <NavLink to="/login" className={navClass}>
-            Login
-          </NavLink>
-          <NavLink to="/register" className={navClass}>
-            Register
-          </NavLink>
+
+          {!isLoggedIn && (
+            <>
+              <NavLink to="/login" className={navClass}>
+                Login
+              </NavLink>
+              <NavLink to="/register" className={navClass}>
+                Register
+              </NavLink>
+            </>
+          )}
         </div>
 
         {isMenuOpen && (
@@ -172,25 +247,43 @@ function Navbar() {
             <NavLink to="/" className={navClass} onClick={closeAllMenus}>
               Home
             </NavLink>
-            <NavLink to="/dashboard" className={navClass} onClick={closeAllMenus}>
-              Dashboard
-            </NavLink>
+
+            {isLoggedIn && (
+              <>
+                <NavLink to="/report" className={navClass} onClick={closeAllMenus}>
+                  Report Issue
+                </NavLink>
+                <NavLink to="/dashboard" className={navClass} onClick={closeAllMenus}>
+                  Dashboard
+                </NavLink>
+                <NavLink
+                  to="/my-complaints"
+                  className={navClass}
+                  onClick={closeAllMenus}
+                >
+                  My Complaints
+                </NavLink>
+              </>
+            )}
+
             <NavLink to="/track" className={navClass} onClick={closeAllMenus}>
               Track Complaint
             </NavLink>
-            <NavLink
-              to="/staff-dashboard"
-              className={navClass}
-              onClick={closeAllMenus}
-            >
+
+            <NavLink to="/staff-dashboard" className={navClass} onClick={closeAllMenus}>
               Staff Portal
             </NavLink>
-            <NavLink to="/login" className={navClass} onClick={closeAllMenus}>
-              Login
-            </NavLink>
-            <NavLink to="/register" className={navClass} onClick={closeAllMenus}>
-              Register
-            </NavLink>
+
+            {!isLoggedIn && (
+              <>
+                <NavLink to="/login" className={navClass} onClick={closeAllMenus}>
+                  Login
+                </NavLink>
+                <NavLink to="/register" className={navClass} onClick={closeAllMenus}>
+                  Register
+                </NavLink>
+              </>
+            )}
 
             <div className="border-t border-white/20 pt-3 mt-3">
               <div className="flex items-center gap-3 px-2 py-2">
@@ -205,25 +298,28 @@ function Navbar() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-white text-sm font-semibold">Guest User</p>
-                  <p className="text-white/80 text-xs">janconnect@example.com</p>
+                  <p className="text-white text-sm font-semibold">{displayName}</p>
+                  <p className="text-white/80 text-xs">{displayEmail}</p>
                 </div>
               </div>
 
-              <Link
-                to="/my-complaints"
-                onClick={closeAllMenus}
-                className="block px-4 py-2 rounded-lg text-sm font-medium text-white/95 hover:bg-white/20"
-              >
-                My Complaints
-              </Link>
-              <Link
-                to="/login"
-                onClick={closeAllMenus}
-                className="block px-4 py-2 rounded-lg text-sm font-medium text-white/95 hover:bg-white/20"
-              >
-                Logout
-              </Link>
+              {isLoggedIn ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 rounded-lg text-sm font-medium text-white/95 hover:bg-white/20"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={closeAllMenus}
+                  className="block px-4 py-2 rounded-lg text-sm font-medium text-white/95 hover:bg-white/20"
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         )}

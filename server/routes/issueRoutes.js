@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Issue = require("../models/Issue");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -23,8 +24,8 @@ const generateComplaintId = async () => {
 };
 
 // POST /api/issues
-// Create new issue
-router.post("/", async (req, res, next) => {
+// Create new issue (protected)
+router.post("/", protect, async (req, res, next) => {
   try {
     const { name, title, category, description, area, latitude, longitude } =
       req.body;
@@ -65,12 +66,31 @@ router.post("/", async (req, res, next) => {
       area,
       latitude: parsedLatitude,
       longitude: parsedLongitude,
+      user: req.user._id,
     });
 
     res.status(201).json({
       success: true,
       message: "Issue reported successfully",
       data: newIssue,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/issues/my
+// Get only logged-in user's issues latest first
+router.get("/my", protect, async (req, res, next) => {
+  try {
+    const issues = await Issue.find({ user: req.user._id }).sort({
+      createdAt: -1,
+    });
+
+    res.status(200).json({
+      success: true,
+      count: issues.length,
+      data: issues,
     });
   } catch (error) {
     next(error);

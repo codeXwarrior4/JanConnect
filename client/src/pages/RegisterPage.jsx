@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import API from '../api'
 
 function RegisterPage() {
   const navigate = useNavigate()
@@ -7,7 +8,6 @@ function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
     password: '',
     confirmPassword: '',
   })
@@ -16,6 +16,14 @@ function RegisterPage() {
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
+  useEffect(() => {
+    const token = localStorage.getItem('janconnect_token')
+
+    if (token) {
+      navigate('/dashboard', { replace: true })
+    }
+  }, [navigate])
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -23,35 +31,44 @@ function RegisterPage() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
     setSuccessMessage('')
 
     try {
-      if (
-        !formData.name ||
-        !formData.email ||
-        !formData.phone ||
-        !formData.password ||
-        !formData.confirmPassword
-      ) {
+      const { name, email, password, confirmPassword } = formData
+
+      if (!name || !email || !password || !confirmPassword) {
         throw new Error('Please fill in all fields.')
       }
 
-      if (formData.password !== formData.confirmPassword) {
+      if (password.length < 6) {
+        throw new Error('Password must be at least 6 characters.')
+      }
+
+      if (password !== confirmPassword) {
         throw new Error('Passwords do not match.')
       }
 
+      await API.post('/api/auth/register', {
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+      })
+
       setSuccessMessage('Registration successful. Redirecting to login...')
+
       setTimeout(() => {
-        navigate('/login')
+        navigate('/login', { replace: true })
       }, 1200)
     } catch (err) {
-      setError(err.message || 'Registration failed.')
+      setError(
+        err?.response?.data?.message || err.message || 'Registration failed.'
+      )
     } finally {
-      setTimeout(() => setLoading(false), 800)
+      setLoading(false)
     }
   }
 
@@ -89,32 +106,17 @@ function RegisterPage() {
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter email"
-                className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Phone</label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="Enter phone number"
-                className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter email"
+              className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">

@@ -1,27 +1,46 @@
-import axios from "axios";
+import API from '../api'
 
-const api = axios.create({
-  baseURL: "http://localhost:5000/api",
-});
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('janconnect_token')
 
-export const createIssue = async (issueData) => {
-  const response = await api.post("/issues", issueData);
-  return response.data;
-};
+  return token
+    ? {
+        Authorization: `Bearer ${token}`,
+      }
+    : {}
+}
+
+export const createIssue = async (payload) => {
+  const response = await API.post('/api/issues', payload, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  })
+
+  return response.data
+}
 
 export const getAllIssues = async () => {
-  const response = await api.get("/issues");
-  return response.data;
-};
+  const response = await API.get('/api/issues')
+  return response.data
+}
+
+export const getMyIssues = async () => {
+  const response = await API.get('/api/issues/my', {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  })
+
+  return response.data
+}
 
 export const getIssueByComplaintId = async (complaintId) => {
-  const response = await api.get(`/issues/${complaintId}`);
-  return response.data;
-};
+  const response = await API.get(`/api/issues/${complaintId}`)
+  return response.data
+}
 
 export const updateIssueStatus = async (id, status) => {
-  const response = await api.patch(`/issues/${id}/status`, { status });
-  return response.data;
-};
-
-export default api;
+  const response = await API.patch(`/api/issues/${id}/status`, { status })
+  return response.data
+}
