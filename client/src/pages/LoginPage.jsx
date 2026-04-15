@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import i18n from '../i18n'
 
 function LoginPage() {
   const navigate = useNavigate()
@@ -29,7 +30,7 @@ function LoginPage() {
       const email = formData.email.trim().toLowerCase()
 
       if (!email || !formData.password) {
-        throw new Error('Please fill in all fields.')
+        throw new Error(i18n.t('errors.fillAllFields'))
       }
 
       setTimeout(() => {
@@ -40,18 +41,21 @@ function LoginPage() {
         }
       }, 700)
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.')
+      setError(err.message || i18n.t('errors.loginFailed'))
     } finally {
       setTimeout(() => setLoading(false), 700)
     }
   }
 
   return (
-    <section className="min-h-[80vh] flex items-center justify-center">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-sm border border-slate-200 p-6 md:p-8">
-        <h1 className="text-3xl font-bold text-center mb-2">Login to Your Account</h1>
+    <section className="min-h-[80vh] flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-md border border-slate-200 p-6 md:p-8">
+        <h1 className="text-3xl font-bold text-center mb-2 text-slate-800">
+          {i18n.t('login.title')}
+        </h1>
+
         <p className="text-center text-slate-600 mb-6">
-          Access your complaint dashboard or staff panel
+          {i18n.t('login.subtitle')}
         </p>
 
         {error && (
@@ -62,63 +66,74 @@ function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-2">Email Address</label>
+            <label className="block text-sm font-medium mb-2">
+              {i18n.t('login.email')}
+            </label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               placeholder="you@example.com"
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-400"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Password</label>
+            <label className="block text-sm font-medium mb-2">
+              {i18n.t('login.password')}
+            </label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Enter your password"
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={i18n.t('login.passwordPlaceholder')}
+              className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-400"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Login As</label>
+            <label className="block text-sm font-medium mb-2">
+              {i18n.t('login.role')}
+            </label>
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-400"
             >
-              <option value="citizen">Citizen</option>
-              <option value="staff">Staff</option>
+              <option value="citizen">{i18n.t('login.citizen')}</option>
+              <option value="staff">{i18n.t('login.staff')}</option>
             </select>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition disabled:opacity-70"
+            className="w-full bg-sky-500 text-white py-3 rounded-xl font-semibold hover:bg-sky-600 transition disabled:opacity-70"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? i18n.t('login.loading') : i18n.t('login.button')}
           </button>
         </form>
 
         <p className="text-center text-sm text-slate-600 mt-6">
-          Don&apos;t have an account?{' '}
-          <Link to="/register" className="text-blue-600 font-medium hover:underline">
-            Register here
+          {i18n.t('login.noAccount')}{' '}
+          <Link
+            to="/register"
+            className="text-sky-600 font-medium hover:underline"
+          >
+            {i18n.t('login.register')}
           </Link>
         </p>
 
         <div className="mt-6 rounded-2xl bg-slate-50 border border-slate-200 p-4">
-          <h2 className="font-semibold mb-2">Test Accounts</h2>
-          <p className="text-sm text-slate-600">Admin: admin@city.gov.in / password123</p>
+          <h2 className="font-semibold mb-2">{i18n.t('login.testAccounts')}</h2>
+          <p className="text-sm text-slate-600">
+            Admin: admin@city.gov.in / password123
+          </p>
           <p className="text-sm text-slate-600">
             Citizen: john@example.com / password123
           </p>

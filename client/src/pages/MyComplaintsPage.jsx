@@ -1,40 +1,50 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import i18n from '../i18n'
 
 function MyComplaintsPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [expandedId, setExpandedId] = useState(null)
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en')
+
+  useEffect(() => {
+    const handleLanguageChanged = (lng) => {
+      setCurrentLanguage(lng)
+    }
+
+    i18n.on('languageChanged', handleLanguageChanged)
+    return () => {
+      i18n.off('languageChanged', handleLanguageChanged)
+    }
+  }, [])
 
   const complaints = [
     {
       id: 1,
-      title: 'water stagnant',
-      description:
-        'water stagnant in the street due to heavy rain for the past 2 weeks. Kindly take action regarding this issue.',
-      category: 'Water Supply Issue',
+      title: i18n.t('myComplaints.sample1Title'),
+      description: i18n.t('myComplaints.sample1Desc'),
+      category: i18n.t('myComplaints.waterSupplyIssue'),
       date: '19/12/2025',
-      status: 'Pending',
+      status: i18n.t('myComplaints.pending'),
       evidenceCount: 1,
       gps: '13.018305, 80.219906',
     },
     {
       id: 2,
-      title: 'water stagnant',
-      description:
-        'water stagnant in the street due to heavy rain for the past 2 weeks please take action regarding this issue.',
-      category: 'Water Supply Issue',
+      title: i18n.t('myComplaints.sample2Title'),
+      description: i18n.t('myComplaints.sample2Desc'),
+      category: i18n.t('myComplaints.waterSupplyIssue'),
       date: '19/12/2025',
-      status: 'Resolved',
+      status: i18n.t('myComplaints.resolved'),
       evidenceCount: 1,
       gps: '13.018305, 80.219906',
     },
     {
       id: 3,
-      title: 'irregular supply of drinking water',
-      description:
-        'for the past 2 weeks, the water is not supplied in our locality. Kindly please take action on this issue.',
-      category: 'Water Supply Issue',
+      title: i18n.t('myComplaints.sample3Title'),
+      description: i18n.t('myComplaints.sample3Desc'),
+      category: i18n.t('myComplaints.waterSupplyIssue'),
       date: '19/12/2025',
-      status: 'Resolved',
+      status: i18n.t('myComplaints.resolved'),
       evidenceCount: 1,
       gps: '13.018305, 80.219906',
     },
@@ -45,16 +55,26 @@ function MyComplaintsPage() {
     return complaints.filter(
       (item) => item.status.toLowerCase() === statusFilter.toLowerCase()
     )
-  }, [statusFilter])
+  }, [statusFilter, currentLanguage])
 
   const total = complaints.length
-  const pending = complaints.filter((item) => item.status === 'Pending').length
-  const inProgress = complaints.filter((item) => item.status === 'In Progress').length
-  const resolved = complaints.filter((item) => item.status === 'Resolved').length
+  const pending = complaints.filter(
+    (item) => item.status === i18n.t('myComplaints.pending')
+  ).length
+  const inProgress = complaints.filter(
+    (item) => item.status === i18n.t('myComplaints.inProgress')
+  ).length
+  const resolved = complaints.filter(
+    (item) => item.status === i18n.t('myComplaints.resolved')
+  ).length
 
   const getBadgeClass = (status) => {
-    if (status === 'Resolved') return 'bg-green-100 text-green-600'
-    if (status === 'In Progress') return 'bg-violet-100 text-violet-600'
+    if (status === i18n.t('myComplaints.resolved')) {
+      return 'bg-green-100 text-green-600'
+    }
+    if (status === i18n.t('myComplaints.inProgress')) {
+      return 'bg-violet-100 text-violet-600'
+    }
     return 'bg-amber-100 text-amber-600'
   }
 
@@ -67,14 +87,14 @@ function MyComplaintsPage() {
       <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-4xl font-bold">My Complaints</h1>
+            <h1 className="text-4xl font-bold">{i18n.t('myComplaints.title')}</h1>
             <p className="mt-2 text-slate-600">
-              View all your submitted complaints and their current status
+              {i18n.t('myComplaints.subtitle')}
             </p>
           </div>
 
           <button className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded-xl font-semibold transition">
-            + New Complaint
+            {i18n.t('myComplaints.newComplaint')}
           </button>
         </div>
       </div>
@@ -82,33 +102,41 @@ function MyComplaintsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-blue-600">{total}</div>
-          <div className="mt-2 text-slate-600">Total</div>
+          <div className="mt-2 text-slate-600">{i18n.t('myComplaints.total')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-amber-500">{pending}</div>
-          <div className="mt-2 text-slate-600">Pending</div>
+          <div className="mt-2 text-slate-600">{i18n.t('myComplaints.pending')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-violet-500">{inProgress}</div>
-          <div className="mt-2 text-slate-600">In Progress</div>
+          <div className="mt-2 text-slate-600">{i18n.t('myComplaints.inProgress')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-green-500">{resolved}</div>
-          <div className="mt-2 text-slate-600">Resolved</div>
+          <div className="mt-2 text-slate-600">{i18n.t('myComplaints.resolved')}</div>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-        <label className="block text-sm font-medium mb-2">Filter by Status</label>
+        <label className="block text-sm font-medium mb-2">
+          {i18n.t('myComplaints.filterByStatus')}
+        </label>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="w-full md:w-64 px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All Complaints</option>
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Resolved">Resolved</option>
+          <option value="all">{i18n.t('myComplaints.allComplaints')}</option>
+          <option value={i18n.t('myComplaints.pending')}>
+            {i18n.t('myComplaints.pending')}
+          </option>
+          <option value={i18n.t('myComplaints.inProgress')}>
+            {i18n.t('myComplaints.inProgress')}
+          </option>
+          <option value={i18n.t('myComplaints.resolved')}>
+            {i18n.t('myComplaints.resolved')}
+          </option>
         </select>
       </div>
 
@@ -128,7 +156,7 @@ function MyComplaintsPage() {
                     onClick={() => toggleExpanded(complaint.id)}
                     className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition"
                   >
-                    📷 View Evidence ({complaint.evidenceCount})
+                    📷 {i18n.t('myComplaints.viewEvidence')} ({complaint.evidenceCount})
                   </button>
                 </div>
 
@@ -142,10 +170,10 @@ function MyComplaintsPage() {
 
                 <div className="mt-4 text-sm text-slate-600 flex flex-wrap gap-x-6 gap-y-2">
                   <span>
-                    <strong>Category:</strong> {complaint.category}
+                    <strong>{i18n.t('myComplaints.category')}:</strong> {complaint.category}
                   </span>
                   <span>
-                    <strong>Date:</strong> {complaint.date}
+                    <strong>{i18n.t('myComplaints.date')}:</strong> {complaint.date}
                   </span>
                 </div>
               </div>
@@ -160,7 +188,7 @@ function MyComplaintsPage() {
                 </span>
 
                 <button className="text-blue-600 hover:text-blue-800 font-medium">
-                  View Details →
+                  {i18n.t('myComplaints.viewDetails')}
                 </button>
               </div>
             </div>

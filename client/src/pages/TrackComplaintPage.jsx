@@ -1,6 +1,6 @@
-
 import { useState } from 'react'
 import { getIssueByComplaintId } from '../services/issueService'
+import i18n from '../i18n'
 
 function TrackComplaintPage() {
   const [complaintId, setComplaintId] = useState('')
@@ -20,7 +20,7 @@ function TrackComplaintPage() {
       setComplaint(issue)
     } catch (err) {
       setError(
-        err.response?.data?.message || 'Complaint not found. Please try again.'
+        err.response?.data?.message || i18n.t('trackComplaint.notFound')
       )
     } finally {
       setLoading(false)
@@ -48,9 +48,11 @@ function TrackComplaintPage() {
   return (
     <section className="max-w-3xl mx-auto">
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 md:p-8">
-        <h1 className="text-3xl font-bold mb-2">Track Complaint</h1>
+        <h1 className="text-3xl font-bold mb-2">
+          {i18n.t('trackComplaint.title')}
+        </h1>
         <p className="text-slate-600 mb-6">
-          Enter complaint ID to check the status of your issue.
+          {i18n.t('trackComplaint.subtitle')}
         </p>
 
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
@@ -58,7 +60,7 @@ function TrackComplaintPage() {
             type="text"
             value={complaintId}
             onChange={(e) => setComplaintId(e.target.value)}
-            placeholder="Enter Complaint ID"
+            placeholder={i18n.t('trackComplaint.placeholder')}
             className="flex-1 px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
@@ -67,7 +69,9 @@ function TrackComplaintPage() {
             disabled={loading}
             className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition disabled:opacity-70"
           >
-            {loading ? 'Searching...' : 'Track'}
+            {loading
+              ? i18n.t('trackComplaint.searching')
+              : i18n.t('trackComplaint.button')}
           </button>
         </form>
 
@@ -89,27 +93,32 @@ function TrackComplaintPage() {
                   complaint.status
                 )}`}
               >
-                {complaint.status || 'Submitted'}
+                {complaint.status || i18n.t('trackComplaint.submitted')}
               </span>
             </div>
 
             <div className="space-y-2 text-sm text-slate-700">
               <p>
-                <span className="font-medium">Complaint ID:</span>{' '}
+                <span className="font-medium">
+                  {i18n.t('trackComplaint.complaintId')}:
+                </span>{' '}
                 {complaint.complaintId}
               </p>
               <p>
-                <span className="font-medium">Area:</span> {complaint.area}
+                <span className="font-medium">{i18n.t('trackComplaint.area')}:</span>{' '}
+                {complaint.area}
               </p>
               <p>
-                <span className="font-medium">Description:</span>{' '}
+                <span className="font-medium">
+                  {i18n.t('trackComplaint.description')}:
+                </span>{' '}
                 {complaint.description}
               </p>
               <p>
-                <span className="font-medium">Date:</span>{' '}
+                <span className="font-medium">{i18n.t('trackComplaint.date')}:</span>{' '}
                 {complaint.createdAt
                   ? new Date(complaint.createdAt).toLocaleString()
-                  : 'N/A'}
+                  : i18n.t('trackComplaint.na')}
               </p>
             </div>
           </div>

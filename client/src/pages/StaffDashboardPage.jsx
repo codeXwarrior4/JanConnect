@@ -1,39 +1,48 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import i18n from '../i18n'
 
 function StaffDashboardPage() {
   const [statusFilter, setStatusFilter] = useState('all')
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en')
+
+  useEffect(() => {
+    const handleLanguageChanged = (lng) => {
+      setCurrentLanguage(lng)
+    }
+
+    i18n.on('languageChanged', handleLanguageChanged)
+    return () => {
+      i18n.off('languageChanged', handleLanguageChanged)
+    }
+  }, [])
 
   const complaints = [
     {
       id: 1,
-      title: 'water stagnant',
-      description:
-        'water stagnant in the street due to heavy rain for the past 2 weeks. Kindly take action regarding this issue.',
-      status: 'Pending',
+      title: i18n.t('staffDashboard.sample1Title'),
+      description: i18n.t('staffDashboard.sample1Desc'),
+      status: i18n.t('staffDashboard.pending'),
       area: 'Ward 5',
     },
     {
       id: 2,
-      title: 'water stagnant',
-      description:
-        'water stagnant in the street due to heavy rain for the past 2 weeks please take action regarding this issue.',
-      status: 'Resolved',
+      title: i18n.t('staffDashboard.sample2Title'),
+      description: i18n.t('staffDashboard.sample2Desc'),
+      status: i18n.t('staffDashboard.resolved'),
       area: 'Ward 4',
     },
     {
       id: 3,
-      title: 'irregular supply of drinking water',
-      description:
-        'for the past 2 weeks, the water is not supplied in our locality. Kindly please take action on this issue.',
-      status: 'Resolved',
+      title: i18n.t('staffDashboard.sample3Title'),
+      description: i18n.t('staffDashboard.sample3Desc'),
+      status: i18n.t('staffDashboard.resolved'),
       area: 'Ward 8',
     },
     {
       id: 4,
-      title: 'pipeline leakage near main road',
-      description:
-        'continuous leakage causing water wastage and inconvenience to nearby residents.',
-      status: 'Pending',
+      title: i18n.t('staffDashboard.sample4Title'),
+      description: i18n.t('staffDashboard.sample4Desc'),
+      status: i18n.t('staffDashboard.pending'),
       area: 'Ward 2',
     },
   ]
@@ -43,16 +52,26 @@ function StaffDashboardPage() {
     return complaints.filter(
       (item) => item.status.toLowerCase() === statusFilter.toLowerCase()
     )
-  }, [statusFilter])
+  }, [statusFilter, currentLanguage])
 
   const total = complaints.length
-  const pending = complaints.filter((item) => item.status === 'Pending').length
-  const inProgress = complaints.filter((item) => item.status === 'In Progress').length
-  const resolved = complaints.filter((item) => item.status === 'Resolved').length
+  const pending = complaints.filter(
+    (item) => item.status === i18n.t('staffDashboard.pending')
+  ).length
+  const inProgress = complaints.filter(
+    (item) => item.status === i18n.t('staffDashboard.inProgress')
+  ).length
+  const resolved = complaints.filter(
+    (item) => item.status === i18n.t('staffDashboard.resolved')
+  ).length
 
   const getBadgeClass = (status) => {
-    if (status === 'Resolved') return 'bg-green-100 text-green-600'
-    if (status === 'In Progress') return 'bg-violet-100 text-violet-600'
+    if (status === i18n.t('staffDashboard.resolved')) {
+      return 'bg-green-100 text-green-600'
+    }
+    if (status === i18n.t('staffDashboard.inProgress')) {
+      return 'bg-violet-100 text-violet-600'
+    }
     return 'bg-amber-100 text-amber-600'
   }
 
@@ -61,12 +80,16 @@ function StaffDashboardPage() {
       <div className="bg-blue-700 rounded-3xl text-white px-6 py-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">🧑‍💼 Staff Dashboard</h1>
-            <p className="text-white/90 mt-2">Water Management Department</p>
+            <h1 className="text-3xl font-bold">
+              🧑‍💼 {i18n.t('staffDashboard.title')}
+            </h1>
+            <p className="text-white/90 mt-2">
+              {i18n.t('staffDashboard.department')}
+            </p>
           </div>
 
           <div className="text-sm font-medium bg-white/10 px-4 py-2 rounded-xl">
-            Water Dept Staff
+            {i18n.t('staffDashboard.staffLabel')}
           </div>
         </div>
       </div>
@@ -74,33 +97,41 @@ function StaffDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-blue-600">{total}</div>
-          <div className="mt-2 text-slate-600">Total</div>
+          <div className="mt-2 text-slate-600">{i18n.t('staffDashboard.total')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-amber-500">{pending}</div>
-          <div className="mt-2 text-slate-600">Pending</div>
+          <div className="mt-2 text-slate-600">{i18n.t('staffDashboard.pending')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-violet-500">{inProgress}</div>
-          <div className="mt-2 text-slate-600">In Progress</div>
+          <div className="mt-2 text-slate-600">{i18n.t('staffDashboard.inProgress')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-green-500">{resolved}</div>
-          <div className="mt-2 text-slate-600">Resolved</div>
+          <div className="mt-2 text-slate-600">{i18n.t('staffDashboard.resolved')}</div>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-        <label className="block text-sm font-medium mb-2">Filter by Status</label>
+        <label className="block text-sm font-medium mb-2">
+          {i18n.t('staffDashboard.filterByStatus')}
+        </label>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="w-full md:w-64 px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All</option>
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Resolved">Resolved</option>
+          <option value="all">{i18n.t('staffDashboard.all')}</option>
+          <option value={i18n.t('staffDashboard.pending')}>
+            {i18n.t('staffDashboard.pending')}
+          </option>
+          <option value={i18n.t('staffDashboard.inProgress')}>
+            {i18n.t('staffDashboard.inProgress')}
+          </option>
+          <option value={i18n.t('staffDashboard.resolved')}>
+            {i18n.t('staffDashboard.resolved')}
+          </option>
         </select>
       </div>
 
@@ -116,30 +147,30 @@ function StaffDashboardPage() {
                 <p className="mt-2 text-slate-600">{complaint.description}</p>
 
                 <div className="mt-4 text-sm text-slate-600 flex flex-wrap gap-x-6 gap-y-2">
-                  <span>📍 Location: View on Map →</span>
+                  <span>📍 {i18n.t('staffDashboard.locationViewMap')}</span>
                   <span>
-                    <strong>Area:</strong> {complaint.area}
+                    <strong>{i18n.t('staffDashboard.area')}:</strong> {complaint.area}
                   </span>
                 </div>
 
-                {complaint.status === 'Pending' && (
+                {complaint.status === i18n.t('staffDashboard.pending') && (
                   <div className="mt-4 flex flex-wrap gap-3">
                     <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-                      Start Working
+                      {i18n.t('staffDashboard.startWorking')}
                     </button>
                     <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-                      Resolve
+                      {i18n.t('staffDashboard.resolve')}
                     </button>
                     <button className="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-                      Reject
+                      {i18n.t('staffDashboard.reject')}
                     </button>
                   </div>
                 )}
 
-                {complaint.status === 'In Progress' && (
+                {complaint.status === i18n.t('staffDashboard.inProgress') && (
                   <div className="mt-4">
                     <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-                      Mark Resolved
+                      {i18n.t('staffDashboard.markResolved')}
                     </button>
                   </div>
                 )}

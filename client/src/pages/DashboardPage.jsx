@@ -1,14 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
 import { getAllIssues } from '../services/issueService'
+import i18n from '../i18n'
 
 function DashboardPage() {
   const [complaints, setComplaints] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en')
 
   useEffect(() => {
     fetchComplaints()
+
+    const handleLanguageChanged = (lng) => {
+      setCurrentLanguage(lng)
+    }
+
+    i18n.on('languageChanged', handleLanguageChanged)
+    return () => {
+      i18n.off('languageChanged', handleLanguageChanged)
+    }
   }, [])
 
   const fetchComplaints = async () => {
@@ -26,7 +37,7 @@ function DashboardPage() {
       setComplaints(issues)
     } catch (err) {
       setError(
-        err.response?.data?.message || 'Failed to fetch dashboard data.'
+        err.response?.data?.message || i18n.t('dashboard.fetchError')
       )
     } finally {
       setLoading(false)
@@ -37,15 +48,15 @@ function DashboardPage() {
     return complaints.map((item, index) => ({
       ...item,
       complaintId: item.complaintId || `JC${1000 + index}`,
-      issueTitle: item.issueTitle || 'Complaint Title',
-      description: item.description || 'No description available.',
-      category: item.category || 'General Issue',
-      area: item.area || 'Unknown Area',
-      status: item.status || 'Pending',
+      issueTitle: item.issueTitle || i18n.t('dashboard.defaultTitle'),
+      description: item.description || i18n.t('dashboard.defaultDescription'),
+      category: item.category || i18n.t('dashboard.defaultCategory'),
+      area: item.area || i18n.t('dashboard.defaultArea'),
+      status: item.status || i18n.t('dashboard.pending'),
       createdAt: item.createdAt || new Date().toISOString(),
       evidenceCount: item.evidenceCount || 1,
     }))
-  }, [complaints])
+  }, [complaints, currentLanguage])
 
   const filteredComplaints =
     statusFilter === 'all'
@@ -84,9 +95,9 @@ function DashboardPage() {
       <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-4xl font-bold">My Complaints</h1>
+            <h1 className="text-4xl font-bold">{i18n.t('dashboard.title')}</h1>
             <p className="mt-2 text-slate-600">
-              View your complaint history, evidence, and latest status updates
+              {i18n.t('dashboard.subtitle')}
             </p>
           </div>
 
@@ -94,7 +105,7 @@ function DashboardPage() {
             onClick={fetchComplaints}
             className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded-xl font-semibold transition"
           >
-            Refresh
+            {i18n.t('dashboard.refresh')}
           </button>
         </div>
       </div>
@@ -108,44 +119,46 @@ function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-blue-600">{totalComplaints}</div>
-          <div className="mt-2 text-slate-600">Total</div>
+          <div className="mt-2 text-slate-600">{i18n.t('dashboard.total')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-amber-500">{pendingCount}</div>
-          <div className="mt-2 text-slate-600">Pending</div>
+          <div className="mt-2 text-slate-600">{i18n.t('dashboard.pending')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-violet-500">{inProgressCount}</div>
-          <div className="mt-2 text-slate-600">In Progress</div>
+          <div className="mt-2 text-slate-600">{i18n.t('dashboard.inProgress')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-green-500">{resolvedCount}</div>
-          <div className="mt-2 text-slate-600">Resolved</div>
+          <div className="mt-2 text-slate-600">{i18n.t('dashboard.resolved')}</div>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-        <label className="block text-sm font-medium mb-2">Filter by Status</label>
+        <label className="block text-sm font-medium mb-2">
+          {i18n.t('dashboard.filterByStatus')}
+        </label>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="w-full md:w-64 px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All Complaints</option>
-          <option value="pending">Pending</option>
-          <option value="submitted">Submitted</option>
-          <option value="in progress">In Progress</option>
-          <option value="resolved">Resolved</option>
+          <option value="all">{i18n.t('dashboard.allComplaints')}</option>
+          <option value="pending">{i18n.t('dashboard.pending')}</option>
+          <option value="submitted">{i18n.t('dashboard.submitted')}</option>
+          <option value="in progress">{i18n.t('dashboard.inProgress')}</option>
+          <option value="resolved">{i18n.t('dashboard.resolved')}</option>
         </select>
       </div>
 
       {loading ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-6 text-center">
-          Loading complaints...
+          {i18n.t('dashboard.loading')}
         </div>
       ) : filteredComplaints.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-6 text-center">
-          No complaints found.
+          {i18n.t('dashboard.noComplaints')}
         </div>
       ) : (
         <div className="space-y-5">
@@ -163,23 +176,23 @@ function DashboardPage() {
 
                   <div className="mt-4 flex flex-wrap gap-3">
                     <span className="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg text-sm font-medium">
-                      📷 View Evidence ({complaint.evidenceCount})
+                      📷 {i18n.t('dashboard.viewEvidence')} ({complaint.evidenceCount})
                     </span>
                   </div>
 
                   <div className="mt-4 text-sm text-slate-600 flex flex-wrap gap-x-6 gap-y-2">
                     <span>
-                      <strong>Category:</strong> {complaint.category}
+                      <strong>{i18n.t('dashboard.category')}:</strong> {complaint.category}
                     </span>
                     <span>
-                      <strong>Area:</strong> {complaint.area}
+                      <strong>{i18n.t('dashboard.area')}:</strong> {complaint.area}
                     </span>
                     <span>
-                      <strong>Date:</strong>{' '}
+                      <strong>{i18n.t('dashboard.date')}:</strong>{' '}
                       {new Date(complaint.createdAt).toLocaleDateString()}
                     </span>
                     <span>
-                      <strong>ID:</strong> {complaint.complaintId}
+                      <strong>{i18n.t('dashboard.id')}:</strong> {complaint.complaintId}
                     </span>
                   </div>
                 </div>
@@ -194,7 +207,7 @@ function DashboardPage() {
                   </span>
 
                   <button className="text-blue-600 hover:text-blue-800 font-medium">
-                    View Details →
+                    {i18n.t('dashboard.viewDetails')}
                   </button>
                 </div>
               </div>
