@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import i18n from '../i18n'
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [user, setUser] = useState(null)
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en')
 
   const profileRef = useRef(null)
   const navigate = useNavigate()
@@ -41,11 +43,30 @@ function Navbar() {
     }
   }, [])
 
+  useEffect(() => {
+    const updateLanguage = () => {
+      setCurrentLanguage(i18n.language || 'en')
+    }
+
+    i18n.on('languageChanged', updateLanguage)
+
+    return () => {
+      i18n.off('languageChanged', updateLanguage)
+    }
+  }, [])
+
   const navClass = ({ isActive }) =>
     `block px-4 py-2 rounded-lg text-sm font-medium transition ${
       isActive
         ? 'bg-white text-sky-600 shadow-sm'
         : 'text-white/95 hover:bg-white/20 hover:text-white'
+    }`
+
+  const langButtonClass = (langCode) =>
+    `px-3 py-2 rounded-lg text-sm font-semibold transition ${
+      currentLanguage.startsWith(langCode)
+        ? 'bg-white text-sky-600 shadow-sm'
+        : 'bg-white/15 text-white hover:bg-white/25'
     }`
 
   const closeAllMenus = () => {
@@ -61,6 +82,11 @@ function Navbar() {
     navigate('/login')
   }
 
+  const changeLanguage = async (lng) => {
+    await i18n.changeLanguage(lng)
+    setCurrentLanguage(lng)
+  }
+
   const displayName = user?.name || 'Guest User'
   const displayEmail = user?.email || 'janconnect@example.com'
   const isLoggedIn = Boolean(localStorage.getItem('janconnect_token'))
@@ -74,17 +100,41 @@ function Navbar() {
             onClick={closeAllMenus}
             className="text-2xl md:text-3xl font-bold text-white whitespace-nowrap"
           >
-            JanConnect
+            {i18n.t('appName') || 'JanConnect'}
           </Link>
 
           <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => changeLanguage('en')}
+                className={langButtonClass('en')}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => changeLanguage('hi')}
+                className={langButtonClass('hi')}
+              >
+                हिं
+              </button>
+              <button
+                type="button"
+                onClick={() => changeLanguage('mr')}
+                className={langButtonClass('mr')}
+              >
+                म
+              </button>
+            </div>
+
             <div className="relative hidden md:block" ref={profileRef}>
               <button
                 type="button"
                 onClick={() => setIsProfileOpen((prev) => !prev)}
                 className="w-11 h-11 rounded-full bg-white/95 text-sky-600 flex items-center justify-center shadow-sm hover:bg-white transition"
-                aria-label="Profile"
-                title="Profile"
+                aria-label={i18n.t('nav.profile') || 'Profile'}
+                title={i18n.t('nav.profile') || 'Profile'}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -111,21 +161,21 @@ function Navbar() {
                           onClick={closeAllMenus}
                           className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                         >
-                          My Complaints
+                          {i18n.t('nav.myComplaints') || 'My Complaints'}
                         </Link>
                         <Link
                           to="/dashboard"
                           onClick={closeAllMenus}
                           className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                         >
-                          Dashboard
+                          {i18n.t('nav.dashboard') || 'Dashboard'}
                         </Link>
                         <Link
                           to="/report"
                           onClick={closeAllMenus}
                           className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                         >
-                          Report Issue
+                          {i18n.t('nav.reportIssue') || 'Report Issue'}
                         </Link>
                       </>
                     ) : (
@@ -135,14 +185,14 @@ function Navbar() {
                           onClick={closeAllMenus}
                           className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                         >
-                          Login
+                          {i18n.t('nav.login') || 'Login'}
                         </Link>
                         <Link
                           to="/register"
                           onClick={closeAllMenus}
                           className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                         >
-                          Register
+                          {i18n.t('nav.register') || 'Register'}
                         </Link>
                       </>
                     )}
@@ -155,7 +205,7 @@ function Navbar() {
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                       >
-                        Logout
+                        {i18n.t('nav.logout') || 'Logout'}
                       </button>
                     ) : (
                       <Link
@@ -163,7 +213,7 @@ function Navbar() {
                         onClick={closeAllMenus}
                         className="block px-4 py-2 text-sm text-sky-600 hover:bg-sky-50"
                       >
-                        Login to continue
+                        {i18n.t('nav.loginToContinue') || 'Login to continue'}
                       </Link>
                     )}
                   </div>
@@ -206,37 +256,38 @@ function Navbar() {
 
         <div className="hidden md:flex items-center justify-end gap-2 mt-4">
           <NavLink to="/" className={navClass}>
-            Home
+            {i18n.t('nav.home') || 'Home'}
           </NavLink>
 
           {isLoggedIn && (
             <>
               <NavLink to="/report" className={navClass}>
-                Report Issue
+                {i18n.t('nav.reportIssue') || 'Report Issue'}
               </NavLink>
               <NavLink to="/dashboard" className={navClass}>
-                Dashboard
+                {i18n.t('nav.dashboard') || 'Dashboard'}
               </NavLink>
               <NavLink to="/my-complaints" className={navClass}>
-                My Complaints
+                {i18n.t('nav.myComplaints') || 'My Complaints'}
               </NavLink>
             </>
           )}
 
           <NavLink to="/track" className={navClass}>
-            Track Complaint
+            {i18n.t('nav.trackComplaint') || 'Track Complaint'}
           </NavLink>
+
           <NavLink to="/staff-login" className={navClass}>
-            Staff Login
+            {i18n.t('nav.staffLogin') || 'Staff Login'}
           </NavLink>
 
           {!isLoggedIn && (
             <>
               <NavLink to="/login" className={navClass}>
-                Login
+                {i18n.t('nav.login') || 'Login'}
               </NavLink>
               <NavLink to="/register" className={navClass}>
-                Register
+                {i18n.t('nav.register') || 'Register'}
               </NavLink>
             </>
           )}
@@ -245,47 +296,71 @@ function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 space-y-2">
             <NavLink to="/" className={navClass} onClick={closeAllMenus}>
-              Home
+              {i18n.t('nav.home') || 'Home'}
             </NavLink>
 
             {isLoggedIn && (
               <>
                 <NavLink to="/report" className={navClass} onClick={closeAllMenus}>
-                  Report Issue
+                  {i18n.t('nav.reportIssue') || 'Report Issue'}
                 </NavLink>
                 <NavLink to="/dashboard" className={navClass} onClick={closeAllMenus}>
-                  Dashboard
+                  {i18n.t('nav.dashboard') || 'Dashboard'}
                 </NavLink>
                 <NavLink
                   to="/my-complaints"
                   className={navClass}
                   onClick={closeAllMenus}
                 >
-                  My Complaints
+                  {i18n.t('nav.myComplaints') || 'My Complaints'}
                 </NavLink>
               </>
             )}
 
             <NavLink to="/track" className={navClass} onClick={closeAllMenus}>
-              Track Complaint
+              {i18n.t('nav.trackComplaint') || 'Track Complaint'}
             </NavLink>
 
             <NavLink to="/staff-dashboard" className={navClass} onClick={closeAllMenus}>
-              Staff Portal
+              {i18n.t('nav.staffPortal') || 'Staff Portal'}
             </NavLink>
 
             {!isLoggedIn && (
               <>
                 <NavLink to="/login" className={navClass} onClick={closeAllMenus}>
-                  Login
+                  {i18n.t('nav.login') || 'Login'}
                 </NavLink>
                 <NavLink to="/register" className={navClass} onClick={closeAllMenus}>
-                  Register
+                  {i18n.t('nav.register') || 'Register'}
                 </NavLink>
               </>
             )}
 
             <div className="border-t border-white/20 pt-3 mt-3">
+              <div className="flex gap-2 px-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => changeLanguage('en')}
+                  className={langButtonClass('en')}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => changeLanguage('hi')}
+                  className={langButtonClass('hi')}
+                >
+                  हिं
+                </button>
+                <button
+                  type="button"
+                  onClick={() => changeLanguage('mr')}
+                  className={langButtonClass('mr')}
+                >
+                  म
+                </button>
+              </div>
+
               <div className="flex items-center gap-3 px-2 py-2">
                 <div className="w-10 h-10 rounded-full bg-white text-sky-600 flex items-center justify-center">
                   <svg
@@ -309,7 +384,7 @@ function Navbar() {
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 rounded-lg text-sm font-medium text-white/95 hover:bg-white/20"
                 >
-                  Logout
+                  {i18n.t('nav.logout') || 'Logout'}
                 </button>
               ) : (
                 <Link
@@ -317,7 +392,7 @@ function Navbar() {
                   onClick={closeAllMenus}
                   className="block px-4 py-2 rounded-lg text-sm font-medium text-white/95 hover:bg-white/20"
                 >
-                  Login
+                  {i18n.t('nav.login') || 'Login'}
                 </Link>
               )}
             </div>
