@@ -1,69 +1,86 @@
 import { Link } from 'react-router-dom'
 
 function HomePage() {
+  const stats = [
+    { label: 'Total Complaints', value: '0', color: 'text-blue-600' },
+    { label: 'Pending', value: '0', color: 'text-amber-500' },
+    { label: 'In Progress', value: '0', color: 'text-violet-500' },
+    { label: 'Resolved', value: '0', color: 'text-green-500' },
+  ]
+
+  const steps = [
+    {
+      title: 'Raise a complaint',
+      description:
+        'Submit your civic issue with title, category, location, and description.',
+    },
+    {
+      title: 'Attach location and proof',
+      description:
+        'Capture GPS coordinates and optionally add complaint evidence.',
+    },
+    {
+      title: 'Track complaint status',
+      description:
+        'Monitor whether your complaint is pending, in progress, or resolved.',
+    },
+  ]
+
   return (
-    <section className="min-h-[80vh] flex items-center">
-      <div className="w-full grid md:grid-cols-2 gap-10 items-center">
-        <div>
-          <p className="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            Smart City Citizen Management System
-          </p>
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight text-slate-900">
-            Report civic issues with transparency using JanConnect
-          </h1>
-          <p className="mt-5 text-slate-600 text-lg leading-8">
-            Citizens can report issues like potholes, garbage, water leakage,
-            and streetlight problems. Track complaint progress and make city
-            maintenance more transparent.
-          </p>
+    <section className="space-y-10">
+      <div className="rounded-3xl bg-blue-500 text-white px-6 py-16 md:py-24 text-center shadow-sm">
+        <h1 className="text-4xl md:text-6xl font-bold">Make Your Voice Heard</h1>
+        <p className="mt-4 text-lg md:text-xl text-white/90">
+          Report civic issues and help improve your community
+        </p>
 
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Link
-              to="/report"
-              className="bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition"
-            >
-              Report Issue
-            </Link>
-            <Link
-              to="/track"
-              className="bg-white border border-slate-300 text-slate-800 px-6 py-3 rounded-xl font-medium hover:bg-slate-100 transition"
-            >
-              Track Complaint
-            </Link>
-            <Link
-              to="/dashboard"
-              className="bg-slate-800 text-white px-6 py-3 rounded-xl font-medium hover:bg-slate-900 transition"
-            >
-              Dashboard
-            </Link>
-          </div>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            to="/report"
+            className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-xl font-semibold transition"
+          >
+            Get Started
+          </Link>
+          <Link
+            to="/track"
+            className="bg-white text-blue-700 hover:bg-slate-100 px-8 py-3 rounded-xl font-semibold transition"
+          >
+            Track Complaint
+          </Link>
         </div>
+      </div>
 
-        <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-8">
-          <h2 className="text-2xl font-bold mb-6">Why JanConnect?</h2>
-
-          <div className="space-y-4">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-              <h3 className="font-semibold">Geo-tagged complaints</h3>
-              <p className="text-slate-600 text-sm mt-1">
-                Capture user location directly from the browser.
-              </p>
+      <div>
+        <h2 className="text-3xl font-bold text-center mb-8">Platform Statistics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center"
+            >
+              <div className={`text-4xl font-bold ${stat.color}`}>{stat.value}</div>
+              <div className="mt-3 text-slate-600 font-medium">{stat.label}</div>
             </div>
+          ))}
+        </div>
+      </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-              <h3 className="font-semibold">Complaint tracking</h3>
-              <p className="text-slate-600 text-sm mt-1">
-                Users can track status through complaint ID.
-              </p>
-            </div>
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-10">
+        <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
 
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-              <h3 className="font-semibold">Transparent dashboard</h3>
-              <p className="text-slate-600 text-sm mt-1">
-                Show total, pending, in progress, and resolved complaints.
-              </p>
+        <div className="grid md:grid-cols-3 gap-5">
+          {steps.map((step, index) => (
+            <div
+              key={step.title}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-6"
+            >
+              <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg mb-4">
+                {index + 1}
+              </div>
+              <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+              <p className="text-slate-600 leading-7">{step.description}</p>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>

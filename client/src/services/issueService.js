@@ -19,4 +19,19 @@ export const getIssueByComplaintId = async(complaintId) => {
     return response.data
 }
 
+export const updateIssueStatus = async(id, status) => {
+    const response = await api.patch(`/issues/${id}/status`, { status })
+    return response.data
+}
+
+export const loginUser = async(credentials) => {
+    const response = await api.post('/auth/login', credentials)
+    return response.data
+}
+
+export const registerUser = async(userData) => {
+    const response = await api.post('/auth/register', userData)
+    return response.data
+}
+
 export default api

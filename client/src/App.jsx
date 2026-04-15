@@ -4,10 +4,14 @@ import HomePage from './pages/HomePage.jsx'
 import ReportIssuePage from './pages/ReportIssuePage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import TrackComplaintPage from './pages/TrackComplaintPage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
+import RegisterPage from './pages/RegisterPage.jsx'
+import MyComplaintsPage from './pages/MyComplaintsPage.jsx'
+import StaffDashboardPage from './pages/StaffDashboardPage.jsx'
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800">
+    <div className="min-h-screen bg-slate-100 text-slate-800">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 py-6">
         <Routes>
@@ -15,6 +19,10 @@ function App() {
           <Route path="/report" element={<ReportIssuePage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/track" element={<TrackComplaintPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/my-complaints" element={<MyComplaintsPage />} />
+          <Route path="/staff-dashboard" element={<StaffDashboardPage />} />
         </Routes>
       </main>
     </div>
