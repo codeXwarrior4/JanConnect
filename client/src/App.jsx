@@ -8,6 +8,8 @@ import LoginPage from './pages/LoginPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import MyComplaintsPage from './pages/MyComplaintsPage.jsx'
 import StaffDashboardPage from './pages/StaffDashboardPage.jsx'
+import StaffLoginPage from './pages/StaffLoginPage.jsx'
+
 
 function App() {
   return (
@@ -23,6 +25,9 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/my-complaints" element={<MyComplaintsPage />} />
           <Route path="/staff-dashboard" element={<StaffDashboardPage />} />
+           <Route path="/staff-login" element={<StaffLoginPage />} />
+           <Route path="/staff-dashboard" element={<StaffDashboardPage />} />
+         
         </Routes>
       </main>
     </div>

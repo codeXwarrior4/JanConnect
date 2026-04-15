@@ -28,28 +28,35 @@ function HomePage() {
 
   return (
     <section className="space-y-10">
-      <div className="rounded-3xl bg-blue-500 text-white px-6 py-16 md:py-24 text-center shadow-sm">
-        <h1 className="text-4xl md:text-6xl font-bold">Make Your Voice Heard</h1>
-        <p className="mt-4 text-lg md:text-xl text-white/90">
-          Report civic issues and help improve your community
+
+      {/* HERO SECTION (WHITE CLEAN) */}
+      <div className="rounded-3xl bg-white px-6 py-16 md:py-24 text-center shadow-sm border border-slate-200">
+        <h1 className="text-4xl md:text-6xl font-bold text-slate-900">
+          Make Your Voice Heard
+        </h1>
+
+        <p className="mt-4 text-lg md:text-xl text-slate-600">
+          Report civic issues and help improve your community using JanConnect
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
             to="/report"
-            className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-xl font-semibold transition"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold transition"
           >
             Get Started
           </Link>
+
           <Link
             to="/track"
-            className="bg-white text-blue-700 hover:bg-slate-100 px-8 py-3 rounded-xl font-semibold transition"
+            className="bg-slate-100 text-blue-600 hover:bg-slate-200 px-8 py-3 rounded-xl font-semibold transition"
           >
             Track Complaint
           </Link>
         </div>
       </div>
 
+      {/* STATS */}
       <div>
         <h2 className="text-3xl font-bold text-center mb-8">Platform Statistics</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -65,6 +72,7 @@ function HomePage() {
         </div>
       </div>
 
+      {/* HOW IT WORKS */}
       <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-10">
         <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
 
@@ -74,7 +82,7 @@ function HomePage() {
               key={step.title}
               className="rounded-2xl border border-slate-200 bg-slate-50 p-6"
             >
-              <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg mb-4">
+              <div className="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-lg mb-4">
                 {index + 1}
               </div>
               <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
@@ -83,6 +91,7 @@ function HomePage() {
           ))}
         </div>
       </div>
+
     </section>
   )
 }

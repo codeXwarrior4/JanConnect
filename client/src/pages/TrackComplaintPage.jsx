@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import { getIssueByComplaintId } from '../services/issueService'
 
@@ -81,9 +80,11 @@ function TrackComplaintPage() {
           <div className="mt-6 border border-slate-200 rounded-2xl p-5 bg-slate-50">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
               <div>
-                <h2 className="text-xl font-bold">{complaint.issueTitle}</h2>
+                {/* ✅ FIXED HERE */}
+                <h2 className="text-xl font-bold">{complaint.title}</h2>
                 <p className="text-slate-500 text-sm">{complaint.category}</p>
               </div>
+
               <span
                 className={`px-3 py-1 rounded-full text-xs font-semibold w-fit ${getStatusStyle(
                   complaint.status

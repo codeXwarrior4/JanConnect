@@ -138,17 +138,12 @@ function ReportIssuePage() {
     try {
       const payload = {
         name: formData.name,
-        issueTitle: formData.issueTitle,
+        title: formData.issueTitle,
         category: formData.category,
         description: formData.description,
         area: formData.area,
-        address: formData.address,
-        city: formData.city,
-        location: {
-          latitude: formData.latitude,
-          longitude: formData.longitude,
-        },
-        evidenceCount: capturedImages.length,
+        latitude: Number(formData.latitude),
+        longitude: Number(formData.longitude),
       }
 
       const response = await createIssue(payload)
