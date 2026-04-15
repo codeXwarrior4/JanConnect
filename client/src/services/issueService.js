@@ -1,0 +1,22 @@
+import axios from 'axios'
+
+const api = axios.create({
+    baseURL: 'http://localhost:5000/api',
+})
+
+export const createIssue = async(issueData) => {
+    const response = await api.post('/issues', issueData)
+    return response.data
+}
+
+export const getAllIssues = async() => {
+    const response = await api.get('/issues')
+    return response.data
+}
+
+export const getIssueByComplaintId = async(complaintId) => {
+    const response = await api.get(`/issues/${complaintId}`)
+    return response.data
+}
+
+export default api
