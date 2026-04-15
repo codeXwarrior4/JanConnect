@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const Issue = require("../models/Issue");
 
 const router = express.Router();
@@ -43,6 +44,16 @@ router.post("/", async (req, res, next) => {
       });
     }
 
+    const parsedLatitude = Number(latitude);
+    const parsedLongitude = Number(longitude);
+
+    if (Number.isNaN(parsedLatitude) || Number.isNaN(parsedLongitude)) {
+      return res.status(400).json({
+        success: false,
+        message: "Latitude and longitude must be valid numbers",
+      });
+    }
+
     const complaintId = await generateComplaintId();
 
     const newIssue = await Issue.create({
@@ -52,8 +63,8 @@ router.post("/", async (req, res, next) => {
       category,
       description,
       area,
-      latitude,
-      longitude,
+      latitude: parsedLatitude,
+      longitude: parsedLongitude,
     });
 
     res.status(201).json({
@@ -131,6 +142,13 @@ router.patch("/:id/status", async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: "Invalid status value",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid issue id",
       });
     }
 
