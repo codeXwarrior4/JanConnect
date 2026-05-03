@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getMyIssues } from '../services/issueService'
 import StatusTimeline from '../components/StatusTimeline'
+import i18n from '../i18n'
 
 function MyComplaintsPage() {
   const [statusFilter, setStatusFilter] = useState('all')
@@ -45,7 +46,7 @@ function MyComplaintsPage() {
       title: item.title || 'Untitled complaint',
       description: item.description || 'No description available.',
       category: item.category || 'General',
-      date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A',
+      date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : i18n.t('trackComplaint.na'),
       updatedAt: item.updatedAt
         ? new Date(item.updatedAt).toLocaleString([], {
             day: '2-digit',
@@ -54,7 +55,7 @@ function MyComplaintsPage() {
             hour: '2-digit',
             minute: '2-digit',
           })
-        : 'N/A',
+        : i18n.t('trackComplaint.na'),
       status: item.status || 'Submitted',
       gps:
         item.latitude !== undefined && item.longitude !== undefined
@@ -99,8 +100,8 @@ function MyComplaintsPage() {
     return (
       <section className="space-y-6">
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-          <h1 className="text-4xl font-bold">My Complaints</h1>
-          <p className="mt-2 text-slate-600">Loading your complaints...</p>
+          <h1 className="text-4xl font-bold">{i18n.t('myComplaints.title')}</h1>
+          <p className="mt-2 text-slate-600">{i18n.t('dashboard.loading')}</p>
         </div>
       </section>
     )
@@ -111,10 +112,8 @@ function MyComplaintsPage() {
       <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-4xl font-bold">My Complaints</h1>
-            <p className="mt-2 text-slate-600">
-              View all your submitted complaints and their current status
-            </p>
+            <h1 className="text-4xl font-bold">{i18n.t('myComplaints.title')}</h1>
+            <p className="mt-2 text-slate-600">{i18n.t('myComplaints.subtitle')}</p>
           </div>
 
           <div className="flex gap-3">
@@ -122,14 +121,14 @@ function MyComplaintsPage() {
               onClick={fetchMyComplaints}
               className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-3 rounded-xl font-semibold transition"
             >
-              Refresh
+              {i18n.t('dashboard.refresh')}
             </button>
 
             <Link
               to="/report"
               className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded-xl font-semibold transition"
             >
-              + New Complaint
+              {i18n.t('myComplaints.newComplaint')}
             </Link>
           </div>
         </div>
@@ -144,7 +143,7 @@ function MyComplaintsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-blue-600">{total}</div>
-          <div className="mt-2 text-slate-600">Total</div>
+          <div className="mt-2 text-slate-600">{i18n.t('myComplaints.total')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-amber-500">{pending}</div>
@@ -152,26 +151,28 @@ function MyComplaintsPage() {
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-violet-500">{inProgress}</div>
-          <div className="mt-2 text-slate-600">In Progress</div>
+          <div className="mt-2 text-slate-600">{i18n.t('myComplaints.inProgress')}</div>
         </div>
         <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center shadow-sm">
           <div className="text-4xl font-bold text-green-500">{resolved}</div>
-          <div className="mt-2 text-slate-600">Resolved</div>
+          <div className="mt-2 text-slate-600">{i18n.t('myComplaints.resolved')}</div>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-        <label className="block text-sm font-medium mb-2">Filter by Status</label>
+        <label className="block text-sm font-medium mb-2">
+          {i18n.t('myComplaints.filterByStatus')}
+        </label>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="w-full md:w-64 px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All Complaints</option>
+          <option value="all">{i18n.t('myComplaints.allComplaints')}</option>
           <option value="Submitted">Submitted</option>
           <option value="Under Review">Under Review</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Resolved">Resolved</option>
+          <option value="In Progress">{i18n.t('myComplaints.inProgress')}</option>
+          <option value="Resolved">{i18n.t('myComplaints.resolved')}</option>
         </select>
       </div>
 
@@ -205,10 +206,10 @@ function MyComplaintsPage() {
 
                     <div className="mt-4 grid gap-2 text-sm text-slate-600 md:grid-cols-2">
                       <p>
-                        <strong>Category:</strong> {complaint.category}
+                        <strong>{i18n.t('myComplaints.category')}:</strong> {complaint.category}
                       </p>
                       <p>
-                        <strong>Date:</strong> {complaint.date}
+                        <strong>{i18n.t('myComplaints.date')}:</strong> {complaint.date}
                       </p>
                       <p>
                         <strong>GPS:</strong> {complaint.gps}
@@ -232,7 +233,7 @@ function MyComplaintsPage() {
                       onClick={() => toggleExpanded(complaint.id)}
                       className="text-blue-600 hover:text-blue-800 font-medium"
                     >
-                      {isExpanded ? 'Hide Details ↑' : 'View Details →'}
+                      {isExpanded ? 'Hide Details ↑' : i18n.t('myComplaints.viewDetails')}
                     </button>
                   </div>
                 </div>

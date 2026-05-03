@@ -1,42 +1,38 @@
 import { Link } from 'react-router-dom'
+import i18n from '../i18n'
 
 function HomePage() {
   const stats = [
-    { label: 'Total Complaints', value: '0', color: 'text-blue-600' },
-    { label: 'Pending', value: '0', color: 'text-amber-500' },
-    { label: 'In Progress', value: '0', color: 'text-violet-500' },
-    { label: 'Resolved', value: '0', color: 'text-green-500' },
+    { label: i18n.t('home.totalComplaints'), value: '0', color: 'text-blue-600' },
+    { label: i18n.t('home.pending'), value: '0', color: 'text-amber-500' },
+    { label: i18n.t('home.inProgress'), value: '0', color: 'text-violet-500' },
+    { label: i18n.t('home.resolved'), value: '0', color: 'text-green-500' },
   ]
 
   const steps = [
     {
-      title: 'Raise a complaint',
-      description:
-        'Submit your civic issue with title, category, location, and description.',
+      title: i18n.t('home.step1Title'),
+      description: i18n.t('home.step1Desc'),
     },
     {
-      title: 'Attach location and proof',
-      description:
-        'Capture GPS coordinates and optionally add complaint evidence.',
+      title: i18n.t('home.step2Title'),
+      description: i18n.t('home.step2Desc'),
     },
     {
-      title: 'Track complaint status',
-      description:
-        'Monitor whether your complaint is pending, in progress, or resolved.',
+      title: i18n.t('home.step3Title'),
+      description: i18n.t('home.step3Desc'),
     },
   ]
 
   return (
     <section className="space-y-10">
-
-      {/* HERO SECTION (WHITE CLEAN) */}
       <div className="rounded-3xl bg-white px-6 py-16 md:py-24 text-center shadow-sm border border-slate-200">
         <h1 className="text-4xl md:text-6xl font-bold text-slate-900">
-          Make Your Voice Heard
+          {i18n.t('home.heroTitle')}
         </h1>
 
         <p className="mt-4 text-lg md:text-xl text-slate-600">
-          Report civic issues and help improve your community using JanConnect
+          {i18n.t('home.heroSubtitle')}
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -44,21 +40,22 @@ function HomePage() {
             to="/report"
             className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold transition"
           >
-            Get Started
+            {i18n.t('home.getStarted')}
           </Link>
 
           <Link
             to="/track"
             className="bg-slate-100 text-blue-600 hover:bg-slate-200 px-8 py-3 rounded-xl font-semibold transition"
           >
-            Track Complaint
+            {i18n.t('home.trackComplaint')}
           </Link>
         </div>
       </div>
 
-      {/* STATS */}
       <div>
-        <h2 className="text-3xl font-bold text-center mb-8">Platform Statistics</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">
+          {i18n.t('home.platformStats')}
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {stats.map((stat) => (
             <div
@@ -72,9 +69,10 @@ function HomePage() {
         </div>
       </div>
 
-      {/* HOW IT WORKS */}
       <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-10">
-        <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">
+          {i18n.t('home.howItWorks')}
+        </h2>
 
         <div className="grid md:grid-cols-3 gap-5">
           {steps.map((step, index) => (
@@ -91,7 +89,6 @@ function HomePage() {
           ))}
         </div>
       </div>
-
     </section>
   )
 }

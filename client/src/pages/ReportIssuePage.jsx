@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import ComplaintLocationPicker from '../components/ComplaintLocationPicker'
 import { createIssue } from '../services/issueService'
+import i18n from '../i18n'
 
 function ReportIssuePage() {
   const initialFormData = {
@@ -63,7 +64,7 @@ function ReportIssuePage() {
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser.')
+      setError(i18n.t('reportIssue.locationUnsupported'))
       setSuccessMessage('')
       scrollToMessage()
       return
@@ -84,7 +85,7 @@ function ReportIssuePage() {
         setLocationLoading(false)
       },
       () => {
-        setError('Unable to fetch location. Please allow location access.')
+        setError(i18n.t('reportIssue.locationDenied'))
         setSuccessMessage('')
         setLocationLoading(false)
         scrollToMessage()
@@ -103,7 +104,7 @@ function ReportIssuePage() {
       setSuccessMessage('')
 
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera is not supported in this browser.')
+        throw new Error(i18n.t('reportIssue.cameraUnsupported'))
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -118,9 +119,7 @@ function ReportIssuePage() {
       streamRef.current = stream
       setCameraOpen(true)
     } catch (err) {
-      setError(
-        err?.message || 'Unable to access camera. Please allow camera permission.'
-      )
+      setError(err?.message || i18n.t('reportIssue.cameraAccessDenied'))
       setSuccessMessage('')
       scrollToMessage()
     }
@@ -142,9 +141,7 @@ function ReportIssuePage() {
   useEffect(() => {
     if (cameraOpen && videoRef.current && streamRef.current) {
       videoRef.current.srcObject = streamRef.current
-      videoRef.current
-        .play()
-        .catch(() => {})
+      videoRef.current.play().catch(() => {})
     }
   }, [cameraOpen])
 
@@ -160,7 +157,7 @@ function ReportIssuePage() {
     if (!videoRef.current || !canvasRef.current) return
 
     if (capturedImages.length >= 5) {
-      setError('You can keep up to 5 evidence images only.')
+      setError(i18n.t('reportIssue.maxImages'))
       setSuccessMessage('')
       scrollToMessage()
       return
@@ -199,7 +196,7 @@ function ReportIssuePage() {
     const remainingSlots = 5 - capturedImages.length
 
     if (remainingSlots <= 0) {
-      setError('Maximum 5 evidence images allowed.')
+      setError(i18n.t('reportIssue.maxImages'))
       setSuccessMessage('')
       scrollToMessage()
       return
@@ -228,7 +225,7 @@ function ReportIssuePage() {
         setCapturedImages((prev) => [...prev, ...images])
       })
       .catch(() => {
-        setError('Failed to read selected images.')
+        setError(i18n.t('reportIssue.imageReadFailed'))
         setSuccessMessage('')
         scrollToMessage()
       })
@@ -255,11 +252,11 @@ function ReportIssuePage() {
       const token = localStorage.getItem('janconnect_token')
 
       if (!token) {
-        throw new Error('Please login first to submit a complaint.')
+        throw new Error(i18n.t('reportIssue.loginRequired'))
       }
 
       if (!formData.latitude || !formData.longitude) {
-        throw new Error('Please select complaint location first.')
+        throw new Error(i18n.t('reportIssue.locationRequired'))
       }
 
       const payload = {
@@ -289,7 +286,7 @@ function ReportIssuePage() {
         response?.data?.data?.complaintId ||
         ''
 
-      setSuccessMessage('Complaint submitted successfully.')
+      setSuccessMessage(i18n.t('reportIssue.success'))
       setComplaintId(newComplaintId)
       setFormData(initialFormData)
       setCapturedImages([])
@@ -313,10 +310,10 @@ function ReportIssuePage() {
     <section className="max-w-5xl mx-auto px-4 pb-10">
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 md:p-8">
         <h1 className="text-3xl md:text-4xl font-bold text-center text-slate-900">
-          Report New Complaint
+          {i18n.t('reportIssue.title')}
         </h1>
         <p className="text-center text-slate-600 mt-2 mb-8">
-          Geo-tag the issue, attach evidence, and submit it instantly.
+          {i18n.t('reportIssue.subtitle')}
         </p>
 
         <div ref={messageRef}>
@@ -341,20 +338,24 @@ function ReportIssuePage() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="grid gap-5 md:grid-cols-2">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium mb-2">Your Name *</label>
+              <label className="block text-sm font-medium mb-2">
+                {i18n.t('reportIssue.yourName')} *
+              </label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Enter your full name"
+                placeholder={i18n.t('register.fullNamePlaceholder')}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Category *</label>
+              <label className="block text-sm font-medium mb-2">
+                {i18n.t('reportIssue.category')} *
+              </label>
               <select
                 name="category"
                 value={formData.category}
@@ -362,7 +363,7 @@ function ReportIssuePage() {
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="">Select category</option>
+                <option value="">{i18n.t('reportIssue.selectCategory')}</option>
                 {categoryOptions.map((category) => (
                   <option key={category} value={category}>
                     {category}
@@ -372,7 +373,9 @@ function ReportIssuePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Issue Title *</label>
+              <label className="block text-sm font-medium mb-2">
+                {i18n.t('reportIssue.issueTitle')} *
+              </label>
               <input
                 type="text"
                 name="issueTitle"
@@ -385,51 +388,59 @@ function ReportIssuePage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium mb-2">Description *</label>
+              <label className="block text-sm font-medium mb-2">
+                {i18n.t('reportIssue.description')} *
+              </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
                 rows="4"
-                placeholder="Describe the issue clearly"
+                placeholder={i18n.t('reportIssue.description')}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Area *</label>
+              <label className="block text-sm font-medium mb-2">
+                {i18n.t('reportIssue.area')} *
+              </label>
               <input
                 type="text"
                 name="area"
                 value={formData.area}
                 onChange={handleChange}
-                placeholder="Enter area/locality"
+                placeholder={i18n.t('reportIssue.area')}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Address</label>
+              <label className="block text-sm font-medium mb-2">
+                {i18n.t('reportIssue.address')}
+              </label>
               <input
                 type="text"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                placeholder="Street / landmark"
+                placeholder={i18n.t('reportIssue.address')}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium mb-2">City</label>
+              <label className="block text-sm font-medium mb-2">
+                {i18n.t('reportIssue.city')}
+              </label>
               <input
                 type="text"
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
-                placeholder="City name"
+                placeholder={i18n.t('reportIssue.city')}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -439,10 +450,10 @@ function ReportIssuePage() {
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-slate-900">
-                  📍 Step 1: Geo-tag Location *
+                  📍 {i18n.t('reportIssue.locationStep')} *
                 </h2>
                 <p className="text-slate-600 mt-1">
-                  Use current location and adjust the pin for exact accuracy.
+                  {i18n.t('reportIssue.locationHelp')}
                 </p>
               </div>
 
@@ -451,7 +462,9 @@ function ReportIssuePage() {
                 onClick={handleGetLocation}
                 className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-600"
               >
-                {locationLoading ? 'Getting Location...' : 'Use Current Location'}
+                {locationLoading
+                  ? i18n.t('reportIssue.gettingLocation')
+                  : i18n.t('reportIssue.useCurrentLocation')}
               </button>
             </div>
 
@@ -466,28 +479,32 @@ function ReportIssuePage() {
 
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium mb-2">Latitude *</label>
+                <label className="block text-sm font-medium mb-2">
+                  {i18n.t('reportIssue.latitude')} *
+                </label>
                 <input
                   type="number"
                   step="any"
                   name="latitude"
                   value={formData.latitude}
                   onChange={handleChange}
-                  placeholder="Latitude"
+                  placeholder={i18n.t('reportIssue.latitude')}
                   className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Longitude *</label>
+                <label className="block text-sm font-medium mb-2">
+                  {i18n.t('reportIssue.longitude')} *
+                </label>
                 <input
                   type="number"
                   step="any"
                   name="longitude"
                   value={formData.longitude}
                   onChange={handleChange}
-                  placeholder="Longitude"
+                  placeholder={i18n.t('reportIssue.longitude')}
                   className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -499,10 +516,10 @@ function ReportIssuePage() {
             <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-slate-900">
-                  📸 Step 2: Capture Photos/Videos *
+                  📸 {i18n.t('reportIssue.evidenceStep')} *
                 </h2>
                 <p className="text-slate-600 mt-1">
-                  Add complaint evidence from camera or album/gallery.
+                  {i18n.t('reportIssue.evidenceHelp')}
                 </p>
               </div>
 
@@ -518,7 +535,7 @@ function ReportIssuePage() {
                   onClick={openCamera}
                   className="w-full rounded-2xl bg-emerald-500 py-4 text-lg font-semibold text-white transition hover:bg-emerald-600"
                 >
-                  Open Camera
+                  {i18n.t('reportIssue.openCamera')}
                 </button>
               ) : (
                 <button
@@ -526,7 +543,7 @@ function ReportIssuePage() {
                   onClick={closeCamera}
                   className="w-full rounded-2xl bg-slate-800 py-4 text-lg font-semibold text-white transition hover:bg-slate-900"
                 >
-                  Close Camera
+                  {i18n.t('reportIssue.closeCamera')}
                 </button>
               )}
 
@@ -535,7 +552,7 @@ function ReportIssuePage() {
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full rounded-2xl bg-blue-500 py-4 text-lg font-semibold text-white transition hover:bg-blue-600"
               >
-                Import from Album
+                {i18n.t('reportIssue.importFromAlbum')}
               </button>
 
               <input
@@ -570,7 +587,7 @@ function ReportIssuePage() {
                   onClick={capturePhoto}
                   className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-white transition hover:bg-emerald-600"
                 >
-                  Take Photo
+                  {i18n.t('reportIssue.takePhoto')}
                 </button>
               </div>
             )}
@@ -581,7 +598,7 @@ function ReportIssuePage() {
               <div className="mt-6">
                 <div className="mb-3 flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-slate-900">
-                    Selected Evidence
+                    {i18n.t('reportIssue.selectedEvidence')}
                   </h3>
 
                   <button
@@ -589,7 +606,7 @@ function ReportIssuePage() {
                     onClick={clearAllImages}
                     className="text-sm font-medium text-red-600 hover:text-red-700"
                   >
-                    Clear All
+                    {i18n.t('reportIssue.clearAll')}
                   </button>
                 </div>
 
@@ -611,7 +628,9 @@ function ReportIssuePage() {
                             {image.name || `Evidence ${index + 1}`}
                           </p>
                           <p className="text-xs text-slate-500">
-                            {image.type === 'camera' ? 'Captured from camera' : 'Imported from album'}
+                            {image.type === 'camera'
+                              ? i18n.t('reportIssue.cameraSource')
+                              : i18n.t('reportIssue.albumSource')}
                           </p>
                         </div>
 
@@ -635,7 +654,7 @@ function ReportIssuePage() {
             disabled={loading}
             className="w-full rounded-2xl bg-blue-500 py-4 text-xl font-semibold text-white transition hover:bg-blue-600 disabled:opacity-70"
           >
-            {loading ? 'Submitting Complaint...' : 'Submit Complaint'}
+            {loading ? i18n.t('reportIssue.submitting') : i18n.t('reportIssue.submit')}
           </button>
         </form>
       </div>

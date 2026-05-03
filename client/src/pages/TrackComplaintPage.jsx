@@ -1,18 +1,19 @@
-import { useState } from "react"
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
-import { getIssueByComplaintId } from "../services/issueService"
-import "leaflet/dist/leaflet.css"
+import { useState } from 'react'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { getIssueByComplaintId } from '../services/issueService'
+import i18n from '../i18n'
+import 'leaflet/dist/leaflet.css'
 
 function TrackComplaintPage() {
-  const [complaintId, setComplaintId] = useState("")
+  const [complaintId, setComplaintId] = useState('')
   const [complaint, setComplaint] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
 
   const handleSearch = async (e) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
+    setError('')
     setComplaint(null)
 
     try {
@@ -20,7 +21,7 @@ function TrackComplaintPage() {
       const data = res?.data?.data || res?.data || res
       setComplaint(data)
     } catch {
-      setError("Complaint not found")
+      setError(i18n.t('trackComplaint.notFound'))
     } finally {
       setLoading(false)
     }
@@ -33,14 +34,20 @@ function TrackComplaintPage() {
   return (
     <section className="max-w-4xl mx-auto">
       <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8">
-        <h1 className="text-3xl font-bold text-center mb-6">Track Complaint</h1>
+        <h1 className="text-3xl font-bold text-center mb-2">
+          {i18n.t('trackComplaint.title')}
+        </h1>
+
+        <p className="text-center text-slate-600 mb-6">
+          {i18n.t('trackComplaint.subtitle')}
+        </p>
 
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 mb-6">
           <input
             type="text"
             value={complaintId}
             onChange={(e) => setComplaintId(e.target.value.toUpperCase())}
-            placeholder="Enter Complaint ID"
+            placeholder={i18n.t('trackComplaint.placeholder')}
             className="flex-1 px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
@@ -49,7 +56,7 @@ function TrackComplaintPage() {
             disabled={loading}
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold transition disabled:opacity-70"
           >
-            {loading ? "Searching..." : "Search"}
+            {loading ? i18n.t('trackComplaint.searching') : i18n.t('trackComplaint.button')}
           </button>
         </form>
 
@@ -63,33 +70,33 @@ function TrackComplaintPage() {
           <div className="space-y-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm text-slate-500">Complaint ID</p>
-                <p className="font-semibold">{complaint.complaintId || "-"}</p>
+                <p className="text-sm text-slate-500">{i18n.t('trackComplaint.complaintId')}</p>
+                <p className="font-semibold">{complaint.complaintId || '-'}</p>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm text-slate-500">Status</p>
-                <p className="font-semibold">{complaint.status || "-"}</p>
+                <p className="text-sm text-slate-500">{i18n.t('dashboard.submitted')}</p>
+                <p className="font-semibold">{complaint.status || '-'}</p>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:col-span-2">
                 <p className="text-sm text-slate-500">Title</p>
-                <p className="font-semibold">{complaint.title || complaint.issueTitle || "-"}</p>
+                <p className="font-semibold">{complaint.title || complaint.issueTitle || '-'}</p>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">Category</p>
-                <p className="font-semibold">{complaint.category || "-"}</p>
+                <p className="font-semibold">{complaint.category || '-'}</p>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm text-slate-500">Area</p>
-                <p className="font-semibold">{complaint.area || "-"}</p>
+                <p className="text-sm text-slate-500">{i18n.t('trackComplaint.area')}</p>
+                <p className="font-semibold">{complaint.area || '-'}</p>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:col-span-2">
-                <p className="text-sm text-slate-500">Description</p>
-                <p className="font-semibold">{complaint.description || "-"}</p>
+                <p className="text-sm text-slate-500">{i18n.t('trackComplaint.description')}</p>
+                <p className="font-semibold">{complaint.description || '-'}</p>
               </div>
             </div>
 
